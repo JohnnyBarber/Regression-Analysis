@@ -1,0 +1,124 @@
+R code:
+#4.2-------------------------------------------------------------------------------------------
+beans=read.table("Beans.csv",header=TRUE)
+beans
+
+lsm.taste=aov(Rating~SoakTim+Recipe+SoakTim:Recipe,data=beans)
+par(mfrow=c(2,2))
+plot(lsm.taste)
+
+anova(lsm.taste)
+
+beans.type=lsmeans(lsm.taste, ~SoakTim)
+cld(beas.type, alpha=0.05)
+
+beans.recipe=lsmeans(lsm.taste, ~Recipe)
+cld(beas.recipe, alpha=0.05)
+
+beans.SR=lsmeans(lsm.taste, ~SoakTim:Recipe)
+cld(beas.SR, alpha=0.05)
+
+interact_plot(lsm.taste,pred="SoakTim",modx="Recipe")
+#----------------------------------------------------------------------------------------------
+
+4.2
+> lsm.taste=aov(Rating~SoakTim+Crock:SoakTim+Recipe+SoakTim:Recipe,data=beans)
+> par(mfrow=c(2,2))
+> plot(lsm.taste)
+ 
+The plots show that the residuals of the mixed model satisfy constant variance and the Q-Q plot shows the normality. Thus, assumptions are satisfied. No transformation is needed at this time. We can do further study with this model.
+
+> anova(lsm.taste)
+Analysis of Variance Table
+
+Response: Rating
+               Df  Sum Sq Mean Sq F value   Pr(>F)    
+SoakTim         1 225.333 225.333  338.00 5.15e-05 ***
+Recipe          2  72.667  36.333   54.50 0.001253 ** 
+SoakTim:Crock   2   0.333   0.167    0.25 0.790123    
+SoakTim:Recipe  2  40.667  20.333   30.50 0.003787 ** 
+Residuals       4   2.667   0.667                     
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+For SoakTim:
+H0: Soak Time have no effect on mean rating score
+Test Statistic F1,4 = 338
+p-value = 5.15 × 10-5 < a = 0.05
+Since the p-value of the Soak Time is smaller than 0.05, we reject null hypothesis and conclude that Soak Time has significant effects on mean taste rating score.
+> beans.type=lsmeans(lsm.taste, ~SoakTim)
+NOTE: Results may be misleading due to involvement in interactions
+> cld(beas.type, alpha=0.05)
+ SoakTim   lsmean       SE df lower.CL upper.CL .group
+ Short   37.75000 0.372678  4 36.71528 38.78472  1    
+ Long    46.58333 0.372678  4 45.54861 47.61805   2   
+
+Results are averaged over the levels of: Recipe 
+Confidence level used: 0.95 
+significance level used: alpha = 0.05 
+By observing the chart above, we can conclude that:
+•	Short soaking time of beans has less impact on mean taste rating score than Long soaking time of beans has.
+•	No other comparisons are significantly different than zero based on the p-values.
+
+For Recipe:
+H0: Recipes have no effect on mean rating score
+Test Statistic F2,4 = 54.5
+p-value = 0.001253 < a = 0.05
+Since the p-value of the Recipes is smaller than 0.05, we reject null hypothesis and conclude that Recipes have significant effects on mean taste rating score.
+> beans.recipe=lsmeans(lsm.taste, ~Recipe)
+NOTE: Results may be misleading due to involvement in interactions
+> cld(beas.recipe, alpha=0.05)
+ Recipe   lsmean        SE df lower.CL upper.CL .group
+ Original   39.0 0.4249183  4 37.82024 40.17976  1    
+ Refried    42.5 0.4249183  4 41.32024 43.67976   2   
+ Barbecue   45.0 0.4249183  4 43.82024 46.17976    3  
+
+Results are averaged over the levels of: SoakTim 
+Confidence level used: 0.95 
+P value adjustment: tukey method for comparing a family of 3 estimates 
+significance level used: alpha = 0.05 
+By observing the chart above, we can conclude that:
+•	Original Recipes has less impact on mean taste rating score than Refried Recipes has.
+•	Original Recipes has less impact on mean taste rating score than Barbecue Recipes has.
+•	Refried Recipes has less impact on mean taste rating score than Barbecue Recipes has.
+•	No other comparisons are significantly different than zero based on the p-values.
+
+
+For Interaction between Soak Time and Recipes:
+H0: the interaction between Soak Time and Recipes has no effect on mean rating score
+Test Statistic F2,4 = 30.5
+p-value = 0.003787 < a = 0.05
+Since the p-value of the interaction between Soak Time and Recipes is smaller than 0.05, we reject null hypothesis and conclude that interaction between Soak Time and Recipes has significant effects on mean taste rating score.
+> beans.SR=lsmeans(lsm.taste, ~SoakTim:Recipe)
+> cld(beas.SR, alpha=0.05)
+ SoakTim Recipe     lsmean        SE df lower.CL upper.CL .group
+ Short   Original 32.41667 0.6009252  4 30.74823 34.08510  1    
+ Short   Barbecue 40.41667 0.6009252  4 38.74823 42.08510   2   
+ Short   Refried  40.41667 0.6009252  4 38.74823 42.08510   2   
+ Long    Refried  44.58333 0.6009252  4 42.91490 46.25177    3  
+ Long    Original 45.58333 0.6009252  4 43.91490 47.25177    3  
+ Long    Barbecue 49.58333 0.6009252  4 47.91490 51.25177     4 
+
+Confidence level used: 0.95 
+P value adjustment: tukey method for comparing a family of 6 estimates 
+significance level used: alpha = 0.05 
+By observing the chart above, we can conclude that:
+•	Beans with Short soaking time and Original recipes have less impacts on the mean taste rating score than beans with Short soaking time and Barbecue recipes.
+•	Beans with Short soaking time and Original recipes have less impacts on the mean taste rating score than beans with Short soaking time and Refried recipes.
+•	Beans with Short soaking time and Original recipes have less impacts on the mean taste rating score than beans with Long soaking time and Refried recipes.
+•	Beans with Short soaking time and Original recipes have less impacts on the mean taste rating score than beans with Long soaking time and Original recipes.
+•	Beans with Short soaking time and Original recipes have less impacts on the mean taste rating score than beans with Long soaking time and Barbecue recipes.
+•	Beans with Short soaking time and Barbecue recipes have less impacts on the mean taste rating score than beans with Long soaking time and Refried recipes.
+•	Beans with Short soaking time and Barbecue recipes have less impacts on the mean taste rating score than beans with Long soaking time and Original recipes.
+•	Beans with Short soaking time and Barbecue recipes have less impacts on the mean taste rating score than beans with Long soaking time and Barbecue recipes. 	
+•	Beans with Short soaking time and Refried recipes have less impacts on the mean taste rating score than beans with Long soaking time and Refried recipes.
+•	Beans with Short soaking time and Refried recipes have less impacts on the mean taste rating score than beans with Long soaking time and Original recipes.
+•	Beans with Short soaking time and Refried recipes have less impacts on the mean taste rating score than beans with Long soaking time and Barbecue recipes. 	
+•	Beans with Long soaking time and Refried recipes have less impacts on the mean taste rating score than beans with Long soaking time and Barbecue recipes.
+•	Beans with Long soaking time and Original recipes have less impacts on the mean taste rating score than beans with Long soaking time and Barbecue recipes.
+•	No other comparisons are significantly different than zero based on the p-values.
+
+
+ 
+By observing the graph above, we can see that at long soak time, beans with original recipes and refried recipes have the similar taste rating score but have lower taste rating score than beans with barbecue recipes. At short soak time, beans with barbecue recipes and refried recipes have similar teats rating score but have higher taste rating score than beans with original recipes. Also, the shorter the soak time, the lower the taste rating score. In general, beans with barbecue recipes tend to have higher taste rating score than beans with original recipes; beans with long soak time tend to have higher taste rating score than beans with short soak time.
